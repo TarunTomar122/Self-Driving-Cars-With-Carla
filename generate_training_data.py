@@ -76,17 +76,31 @@ try:
     from pygame.locals import K_MINUS
     from pygame.locals import K_EQUALS
 except ImportError:
-    raise RuntimeError('cannot import pygame, make sure pygame package is installed')
+    raise RuntimeError(
+        'cannot import pygame, make sure pygame package is installed')
 
 try:
     import numpy as np
 except ImportError:
-    raise RuntimeError('cannot import numpy, make sure numpy package is installed')
+    raise RuntimeError(
+        'cannot import numpy, make sure numpy package is installed')
 
-from direct_keys import PressKey,ReleaseKey, W, A, S, D
+from direct_keys import PressKey, ReleaseKey, W, A, S, D
+
+# ==============================================================================
+# -- this is the global array which stores [image_vector, key_pressed] and when
+# -- the length of this becomes greater than 10K we save it in np format and then
+# -- set it to an empty array as welll as increase the starting value :)
+# -- now you know that this code saves images and key pressed together :)
+# ==============================================================================
 
 OUTPUT_DATA = []
-STARTING_VALUE = 4
+STARTING_VALUE = 1
+
+# ==============================================================================
+# -- Functions to record Keys -------------------------------------------------------------------
+# ==============================================================================
+
 
 def straight():
     PressKey(W)
@@ -94,25 +108,28 @@ def straight():
     ReleaseKey(D)
     ReleaseKey(S)
 
+
 def left():
-    if random.randrange(0,3) == 1:
+    if random.randrange(0, 3) == 1:
         PressKey(W)
     else:
         ReleaseKey(W)
     PressKey(A)
     ReleaseKey(S)
     ReleaseKey(D)
-    #ReleaseKey(S)
+    # ReleaseKey(S)
+
 
 def right():
-    if random.randrange(0,3) == 1:
+    if random.randrange(0, 3) == 1:
         PressKey(W)
     else:
         ReleaseKey(W)
     PressKey(D)
     ReleaseKey(A)
     ReleaseKey(S)
-    
+
+
 def reverse():
     PressKey(S)
     ReleaseKey(A)
@@ -125,31 +142,32 @@ def forward_left():
     PressKey(A)
     ReleaseKey(D)
     ReleaseKey(S)
-    
-    
+
+
 def forward_right():
     PressKey(W)
     PressKey(D)
     ReleaseKey(A)
     ReleaseKey(S)
 
-    
+
 def reverse_left():
     PressKey(S)
     PressKey(A)
     ReleaseKey(W)
     ReleaseKey(D)
 
-    
+
 def reverse_right():
     PressKey(S)
     PressKey(D)
     ReleaseKey(W)
     ReleaseKey(A)
 
+
 def no_keys():
 
-    if random.randrange(0,3) == 1:
+    if random.randrange(0, 3) == 1:
         PressKey(W)
     else:
         ReleaseKey(W)
@@ -157,15 +175,20 @@ def no_keys():
     ReleaseKey(S)
     ReleaseKey(D)
 
-w = [1,0,0,0,0,0,0,0,0]
-s = [0,1,0,0,0,0,0,0,0]
-a = [0,0,1,0,0,0,0,0,0]
-d = [0,0,0,1,0,0,0,0,0]
-wa = [0,0,0,0,1,0,0,0,0]
-wd = [0,0,0,0,0,1,0,0,0]
-sa = [0,0,0,0,0,0,1,0,0]
-sd = [0,0,0,0,0,0,0,1,0]
-nk = [0,0,0,0,0,0,0,0,1]
+
+# ==============================================================================
+# -- Converting the Key Pressed into one hot enconding -------------------------
+# ==============================================================================
+w = [1, 0, 0, 0, 0, 0, 0, 0, 0]
+s = [0, 1, 0, 0, 0, 0, 0, 0, 0]
+a = [0, 0, 1, 0, 0, 0, 0, 0, 0]
+d = [0, 0, 0, 1, 0, 0, 0, 0, 0]
+wa = [0, 0, 0, 0, 1, 0, 0, 0, 0]
+wd = [0, 0, 0, 0, 0, 1, 0, 0, 0]
+sa = [0, 0, 0, 0, 0, 0, 1, 0, 0]
+sd = [0, 0, 0, 0, 0, 0, 0, 1, 0]
+nk = [0, 0, 0, 0, 0, 0, 0, 0, 1]
+
 
 def sumMatrix(A, B):
     A = np.array(A)
@@ -173,13 +196,14 @@ def sumMatrix(A, B):
     answer = A + B
     return answer.tolist()
 
+
 def keys_to_output(keys):
     '''
     Convert keys to a ...multi-hot... array
      0  1  2  3  4   5   6   7    8
     [W, S, A, D, WA, WD, SA, SD, NOKEY] boolean values.
     '''
-    output = [0,0,0,0,0,0,0,0,0]
+    output = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
     if 'W' in keys and 'A' in keys:
         output = wa
@@ -208,8 +232,9 @@ def keys_to_output(keys):
 
 def find_weather_presets():
     rgx = re.compile('.+?(?:(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|$)')
-    name = lambda x: ' '.join(m.group(0) for m in rgx.finditer(x))
-    presets = [x for x in dir(carla.WeatherParameters) if re.match('[A-Z].+', x)]
+    def name(x): return ' '.join(m.group(0) for m in rgx.finditer(x))
+    presets = [x for x in dir(carla.WeatherParameters)
+               if re.match('[A-Z].+', x)]
     return [(getattr(carla.WeatherParameters, x), name(x)) for x in presets]
 
 
@@ -232,7 +257,8 @@ class World(object):
         except RuntimeError as error:
             print('RuntimeError: {}'.format(error))
             print('  The server could not send the OpenDRIVE (.xodr) file:')
-            print('  Make sure it exists, has the same name of your town, and is correct.')
+            print(
+                '  Make sure it exists, has the same name of your town, and is correct.')
             sys.exit(1)
         self.hud = hud
         self.player = None
@@ -251,7 +277,8 @@ class World(object):
         self.player_max_speed_fast = 3.713
         cam_index = self.camera_manager.index if self.camera_manager is not None else 0
         cam_pos_index = self.camera_manager.transform_index if self.camera_manager is not None else 0
-        blueprint = random.choice(self.world.get_blueprint_library().filter(self._actor_filter))
+        blueprint = random.choice(
+            self.world.get_blueprint_library().filter(self._actor_filter))
 
         if self.player is not None:
             spawn_point = self.player.get_transform()
@@ -266,7 +293,8 @@ class World(object):
                 print('Please add some Vehicle Spawn Point to your UE4 scene.')
                 sys.exit(1)
             spawn_points = self.map.get_spawn_points()
-            spawn_point = random.choice(spawn_points) if spawn_points else carla.Transform()
+            spawn_point = random.choice(
+                spawn_points) if spawn_points else carla.Transform()
             self.player = self.world.try_spawn_actor(blueprint, spawn_point)
         self.camera_manager = CameraManager(self.player, self.hud, self._gamma)
         self.camera_manager.transform_index = cam_pos_index
@@ -309,6 +337,7 @@ class World(object):
 
 class KeyboardControl(object):
     """Class that handles keyboard input."""
+
     def __init__(self, world, start_in_autopilot):
         self._autopilot_enabled = start_in_autopilot
         if isinstance(world.player, carla.Vehicle):
@@ -350,7 +379,8 @@ class KeyboardControl(object):
 
         if not self._autopilot_enabled:
             if isinstance(self._control, carla.VehicleControl):
-                self._parse_vehicle_keys(pygame.key.get_pressed(), clock.get_time())
+                self._parse_vehicle_keys(
+                    pygame.key.get_pressed(), clock.get_time())
                 self._control.reverse = self._control.gear < 0
             world.player.apply_control(self._control)
 
@@ -381,7 +411,6 @@ class KeyboardControl(object):
         self._steer_cache = min(0.7, max(-0.7, self._steer_cache))
         self._control.steer = round(self._steer_cache, 1)
         self._control.hand_brake = keys[K_SPACE]
-
 
     @staticmethod
     def _is_quit_shortcut(key):
@@ -479,15 +508,17 @@ class CameraManager(object):
         bound_y = 0.5 + self._parent.bounding_box.extent.y
         Attachment = carla.AttachmentType
         self._camera_transforms = [
-            (carla.Transform(carla.Location(x=-5.5, z=2.5), carla.Rotation(pitch=8.0)), Attachment.SpringArm),
+            (carla.Transform(carla.Location(x=-5.5, z=2.5),
+                             carla.Rotation(pitch=8.0)), Attachment.SpringArm),
             (carla.Transform(carla.Location(x=1.6, z=1.7)), Attachment.Rigid),
             (carla.Transform(carla.Location(x=5.5, y=1.5, z=1.5)), Attachment.SpringArm),
-            (carla.Transform(carla.Location(x=-8.0, z=6.0), carla.Rotation(pitch=6.0)), Attachment.SpringArm),
+            (carla.Transform(carla.Location(x=-8.0, z=6.0),
+                             carla.Rotation(pitch=6.0)), Attachment.SpringArm),
             (carla.Transform(carla.Location(x=-1, y=-bound_y, z=0.5)), Attachment.Rigid)]
         self.transform_index = 1
         self.sensors = [
             ['sensor.camera.rgb', cc.Raw, 'Camera RGB', {}]
-            ]
+        ]
         world = self._parent.get_world()
         bp_library = world.get_blueprint_library()
         for item in self.sensors:
@@ -505,7 +536,8 @@ class CameraManager(object):
     def set_sensor(self, index, notify=True, force_respawn=False):
         index = index % len(self.sensors)
         needs_respawn = True if self.index is None else \
-            (force_respawn or (self.sensors[index][2] != self.sensors[self.index][2]))
+            (force_respawn or (self.sensors[index]
+                               [2] != self.sensors[self.index][2]))
         if needs_respawn:
             if self.sensor is not None:
                 self.sensor.destroy()
@@ -518,22 +550,28 @@ class CameraManager(object):
             # We need to pass the lambda a weak reference to self to avoid
             # circular reference.
             weak_self = weakref.ref(self)
-            self.sensor.listen(lambda image: CameraManager._parse_image(weak_self, image))
+            self.sensor.listen(
+                lambda image: CameraManager._parse_image(weak_self, image))
         if notify:
             self.hud.notification(self.sensors[index][2])
         self.index = index
-
 
     def next_sensor(self):
         self.set_sensor(self.index)
 
     def toggle_recording(self):
         self.recording = not self.recording
-        self.hud.notification('Recording %s' % ('On' if self.recording else 'Off'))
+        self.hud.notification('Recording %s' %
+                              ('On' if self.recording else 'Off'))
 
     def render(self, display):
         if self.surface is not None:
             display.blit(self.surface, (0, 0))
+
+
+# ==============================================================================
+# -- This is where i am taking the image and cropping it and saving it in global array
+# ==============================================================================
 
     @staticmethod
     def _parse_image(weak_self, image):
@@ -541,7 +579,7 @@ class CameraManager(object):
         self = weak_self()
         if not self:
             return
-        
+
         image.convert(self.sensors[self.index][1])
         array = np.frombuffer(image.raw_data, dtype=np.dtype("uint8"))
         array = np.reshape(array, (image.height, image.width, 4))
@@ -557,7 +595,7 @@ class CameraManager(object):
 
 
 def game_loop(args):
-    global OUTPUT_DATA,STARTING_VALUE    
+    global OUTPUT_DATA, STARTING_VALUE
     pygame.init()
     pygame.font.init()
     world = None
@@ -582,16 +620,19 @@ def game_loop(args):
             world.tick(clock)
             world.render(display)
             pygame.display.flip()
-            if(len(OUTPUT_DATA)%100==0):
-                print("Length of output Data: ",len(OUTPUT_DATA))
-            if(len(OUTPUT_DATA)%1000==0):
-                print("Length of output Data(inThousand): ",len(OUTPUT_DATA))    
+            if(len(OUTPUT_DATA) % 100 == 0):
+                print("Length of output Data: ", len(OUTPUT_DATA))
+            if(len(OUTPUT_DATA) % 1000 == 0):
+                print("Length of output Data(inThousand): ", len(OUTPUT_DATA))
+# ==============================================================================
+# -- I save data when len is 10000 so 10000 images saved in one np file ........
+# ==============================================================================
             if len(OUTPUT_DATA) == 10000:
                 filename = "./data/training-data-"+str(STARTING_VALUE)
-                np.save(filename,OUTPUT_DATA)
+                np.save(filename, OUTPUT_DATA)
                 print('SAVED')
                 OUTPUT_DATA = []
-                STARTING_VALUE+=1
+                STARTING_VALUE += 1
 
     finally:
 
