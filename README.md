@@ -9,4 +9,4 @@ By no means u should think that i have made this model by myself XD. I have just
 ![Test_Image](https://github.com/TarunTomar122/Self-Driving-Cars-With-Carla/blob/master/image_segmentation_model/test.jpg)
 ![Predicted_Image](https://github.com/TarunTomar122/Self-Driving-Cars-With-Carla/blob/master/image_segmentation_model/te.jpg)
 
-[![](https://img.shields.io/badge/Donate-Jupyter?style=for-the-badge)](https://razorpay.webug.space/TarunTomar122/Self-Driving-Cars-With-Carla)
+[![](https://img.shields.io/badge/Donate-Jupyter?style=for-the-badge)](https://razorpay.webug.space/TarunTomar122/Self-Driving-Cars-With-Carla)  [<img src="https://avatars2.githubusercontent.com/u/54112921?v=4" width="40" height="40"/>]
