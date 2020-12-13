@@ -10,3 +10,10 @@ By no means u should think that i have made this model by myself XD. I have just
 ![Predicted_Image](https://github.com/TarunTomar122/Self-Driving-Cars-With-Carla/blob/master/image_segmentation_model/te.jpg)
 
 [![](https://img.shields.io/badge/Donate-Jupyter?style=for-the-badge)](https://razorpay.webug.space/TarunTomar122/Self-Driving-Cars-With-Carla)  [<img src="https://avatars2.githubusercontent.com/u/54112921?v=4" width="40" height="40"/>]  <img src="https://avatars2.githubusercontent.com/u/54112921?v=4" width="40" height="40"/>
+## Ka-ching!
+
+<p align="center">
+									  			<a href="https://razorpay.webug.space/TarunTomar122/Self-Driving-Cars-With-Carla"><img src="https://i.imgur.com/ihTLDXK.jpeg" width="200"/></a>
+											</p>
+
+# Supporters
